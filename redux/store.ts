@@ -13,6 +13,7 @@ import {
 } from "redux-persist";
 
 import storage from "redux-persist/lib/storage";
+import authSlice from "./features/authSlice";
 
 const persistConfig = {
   key: "root",
@@ -20,7 +21,7 @@ const persistConfig = {
   storage,
   whitelist: ["auth"],
 };
-const rootReducer = combineReducers({});
+const rootReducer = combineReducers({ auth: authSlice });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
