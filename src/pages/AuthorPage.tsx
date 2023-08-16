@@ -7,44 +7,31 @@ import CardBook from '../components/CardBook';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AudioBookApi from '../api/audioBookApi';
-import { useAppDispatch } from '../redux/hooks';
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
-import { getAllAudioBook } from '../redux/features/audiobookSlice';
-import { listGenre } from '../redux/features/genreSlice';
 
-function AudioBookPage() {
+function AuthorPage() {
 	const [currentPage, setCurrentPage] = useState<number>(1);
-	const [totalBooks, setTotalBooks] = useState<number>(100);
-	const [booksToShow, setBooksToShow] = useState<number>(12);
+	const [totalBooks, setTotalBooks] = useState<number | undefined>(100);
+	const [booksToShow, setBooksToShow] = useState<number>(10);
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [sortingMethod, setSortingMethod] = useState<string | null>(null);
 
 	const [loading, setLoading] = useState<boolean>(true);
-	const listAudioBooks = useSelector((state: RootState) => state.audiobook);
-	const genres = useSelector((state: RootState) => state.genre.genres);
+	const [audioBooks, setAudioBooks] = useState<any>([]);
 
-	const dispatch = useAppDispatch();
 	useEffect(() => {
-		// const config: Query = { page: currentPage, limit: booksToShow };
-		// if (selectedCategory) {
-		// 	config.filter = `{ "genre.id": "${selectedCategory}"}`;
-		// }
-
-		dispatch(getAllAudioBook({ page: currentPage, limit: booksToShow })).then(
-			() => fetchData(),
-		);
+		fetchData();
 	}, [currentPage, booksToShow]);
 
-	useEffect(() => {
-		dispatch(listGenre({}));
-	}, []);
-
 	const fetchData = async () => {
-		if (listAudioBooks.metadata.totalItems) {
-			setTotalBooks(listAudioBooks?.metadata?.totalItems ?? 100);
+		const resp = await AudioBookApi.getListAudioBook({
+			page: currentPage,
+			limit: booksToShow,
+		});
+		if (resp.success) {
+			setAudioBooks(resp.data?.results);
+			setTotalBooks(resp?.data?.meta?.totalItems);
+			setLoading(false);
 		}
-		setLoading(false);
 	};
 
 	const navigate = useNavigate();
@@ -52,18 +39,8 @@ function AudioBookPage() {
 	const handlePageChange = (page: number) => {
 		setCurrentPage(page);
 	};
-
 	const handleCategoryChange = (value: string) => {
 		setSelectedCategory(value);
-		console.log(value);
-
-		const config: Query = { page: currentPage, limit: booksToShow };
-		if (value) {
-			config.filter = `{ "genre.id": "${value}"}`;
-		}
-
-		setLoading(true);
-		dispatch(getAllAudioBook(config)).then(() => fetchData());
 	};
 
 	const handleSortingChange = (value: string) => {
@@ -81,44 +58,32 @@ function AudioBookPage() {
 	return (
 		<AsyncWrapper
 			loading={loading}
-			error={listAudioBooks.error}
-			fulfilled={Boolean(listAudioBooks.audioBooks)}
+			error={null}
+			fulfilled={Boolean(audioBooks)}
 		>
-			<Helmet title='Audio Book page' description='liệt kê sách nói' />
-			{Boolean(listAudioBooks.audioBooks) && (
+			<Helmet title='Homepage' description='Thống kê' />
+			{Boolean(audioBooks) && (
 				<>
 					<div>
-						<h1>Quản lý sách nói</h1>
+						<h1>Quản lý tác giả</h1>
 						<div style={{ marginBottom: 10, marginTop: 10 }}>
 							<Input
 								style={{ width: 200, marginRight: 10 }}
-								placeholder='Tìm kiếm theo tác giả'
+								placeholder='Tìm kiếm theo tên'
 								allowClear
 							></Input>
+
 							<Select
-								style={{ width: 200, marginRight: 10 }}
-								placeholder='Chọn thể loại'
-								onChange={handleCategoryChange}
-								allowClear
-								defaultValue={selectedCategory}
-							>
-								{genres.map((genre: any) => (
-									<Option key={genre.id} value={genre.id}>
-										{genre.name}
-									</Option>
-								))}
-							</Select>
-							<Select
-								style={{ width: 200, marginRight: '20%' }}
+								style={{ width: 200, marginRight: '40%' }}
 								placeholder='Sắp xếp'
 								onChange={handleSortingChange}
 								allowClear
 							>
 								<Option value='title-asc'>Tên A-Z</Option>
 								<Option value='title-desc'>Tên Z-A</Option>
-								<Option value='views-asc'>Lượt xem tăng dần</Option>
+								{/* <Option value='views-asc'>Lượt xem tăng dần</Option>
 								<Option value='views-desc'>Lượt xem tăng dần</Option>
-								<Option value='trending'>Xu hướng</Option>
+								<Option value='trending'>Xu hướng</Option> */}
 							</Select>
 							<Button
 								type='default'
@@ -128,13 +93,12 @@ function AudioBookPage() {
 								}}
 								onClick={() => navigate('/audio-book/create')}
 							>
-								Thêm sách nói
+								Thêm Tác giả
 							</Button>
 						</div>
 						<div style={{ display: 'flex', flexWrap: 'wrap' }}>
-							{listAudioBooks.audioBooks.map((book: any, index: number) => (
+							{audioBooks.map((book: any) => (
 								<CardBook
-									key={index}
 									id={book.id}
 									title={book.title}
 									author={book.author}
@@ -157,4 +121,4 @@ function AudioBookPage() {
 	);
 }
 
-export default AudioBookPage;
+export default AuthorPage;

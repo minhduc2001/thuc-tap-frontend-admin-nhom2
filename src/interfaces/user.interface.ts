@@ -6,7 +6,9 @@ export enum ERole {
 export interface IUser {
 	id: number;
 	email: string;
-	username: string;
+	username?: string;
+	phone?: string;
 	role: ERole;
 	accessToken: string;
+	avatar?: string;
 }

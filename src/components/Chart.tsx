@@ -1,34 +1,48 @@
-import React from 'react';
-import { Line } from 'react-chartjs-2';
+import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import { Line } from '@ant-design/plots';
 
-import 'chart.js/auto';
+const Chart = () => {
+	const [data, setData] = useState([]);
 
-function Chart(props: ChartProps) {
-	const { timestamp, price } = props.history.reduce(
-		(
-			prev: { timestamp: number[]; price: string[] },
-			current: HistoryTimestamp
-		) => ({
-			timestamp: [...prev.timestamp, current.timestamp],
-			price: [...prev.price, current.price],
-		}),
-		{ timestamp: [], price: [] }
-	);
+	useEffect(() => {
+		asyncFetch();
+	}, []);
 
-	const data = {
-		labels: timestamp,
-		datasets: [
-			{
-				label: 'Price In USD',
-				data: price,
-				fill: false,
-				backgroundColor: '#0071bd',
-				borderColor: '#0071bd',
+	const asyncFetch = () => {
+		fetch(
+			'https://gw.alipayobjects.com/os/bmw-prod/e00d52f4-2fa6-47ee-a0d7-105dd95bde20.json',
+		)
+			.then((response) => response.json())
+			.then((json) => setData(json))
+			.catch((error) => {
+				console.log('fetch data failed', error);
+			});
+	};
+	const config = {
+		data,
+		xField: 'year',
+		yField: 'gdp',
+		seriesField: 'name',
+		yAxis: {
+			label: {
+				formatter: (v: any) => `${(v / 10e8).toFixed(1)} B`,
 			},
-		],
+		},
+		// legend: {
+		// 	position: 'top',
+		// },
+		smooth: true,
+		// @TODO 后续会换一种动画方式
+		animation: {
+			appear: {
+				animation: 'path-in',
+				duration: 5000,
+			},
+		},
 	};
 
-	return <Line data={data} />;
-}
+	return <Line {...config} />;
+};
 
 export default Chart;

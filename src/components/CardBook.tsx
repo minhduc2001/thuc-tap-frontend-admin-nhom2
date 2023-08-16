@@ -1,10 +1,12 @@
 import React from 'react';
 import {
+	DeleteOutlined,
 	EditOutlined,
 	EllipsisOutlined,
 	SettingOutlined,
 } from '@ant-design/icons';
 import { Avatar, Card } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 const { Meta } = Card;
 export interface IAudioBook {
@@ -12,7 +14,7 @@ export interface IAudioBook {
 	image: string;
 	author: IAuthor;
 	desc?: string;
-	key: number;
+	id: number;
 }
 
 export interface IAuthor {
@@ -23,6 +25,13 @@ export interface IAuthor {
 }
 
 function CardBook(audioBook: IAudioBook) {
+	const navigate = useNavigate();
+
+	const handleBtnEdit = (e: any) => {
+		navigate('/audio-book/edit/' + audioBook.id);
+	};
+
+	const handleBtnDelete = (e: any) => {};
 	return (
 		<Card
 			style={{ width: 240, margin: 10 }}
@@ -30,20 +39,26 @@ function CardBook(audioBook: IAudioBook) {
 				<img
 					alt={audioBook?.title}
 					src={audioBook?.image}
-					className='w-full h-[300px] object-cover'
+					className='w-full h-[200px] object-cover'
 				/>
 			}
 			hoverable
 			actions={[
-				<SettingOutlined key='setting' />,
-				<EditOutlined key='edit' />,
-				<EllipsisOutlined key='ellipsis' />,
+				<EditOutlined key='edit' onClick={handleBtnEdit} />,
+				<DeleteOutlined key='delete' />,
 			]}
 		>
 			<Meta
-				avatar={<Avatar src={audioBook?.author?.image} />}
+				avatar={
+					<Avatar
+						src={
+							audioBook?.author?.image ??
+							'https://i.pravatar.cc/300?u=fake@pravatar.com'
+						}
+					/>
+				}
 				title={audioBook?.title}
-				description={audioBook?.desc}
+				description={audioBook?.desc ?? 'Đây là câu chuyện ...'}
 			/>
 		</Card>
 	);

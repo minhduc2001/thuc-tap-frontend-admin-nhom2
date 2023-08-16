@@ -1,4 +1,4 @@
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import Provider from '../redux/provider';
 import MainRoutes from './routes';

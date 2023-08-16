@@ -3,6 +3,7 @@ import {
 	FormOutlined,
 	FundOutlined,
 	HomeOutlined,
+	UserOutlined,
 } from '@ant-design/icons';
 import { Avatar, Layout, Menu } from 'antd';
 import { useState } from 'react';
@@ -20,6 +21,20 @@ const items: MenuItem[] = [
 		label: <NavLink to='/audio-book'>Audio Book</NavLink>,
 		key: '/audio-book',
 		icon: <HomeOutlined />,
+	},
+	{
+		label: <NavLink to='/profile'>Profile</NavLink>,
+		key: '/profile',
+		icon: <UserOutlined />,
+	},
+	{
+		label: <NavLink to='/author'>Author</NavLink>,
+		key: '/author',
+		// icon: <></>,
+	},
+	{
+		label: <NavLink to='support'>Support</NavLink>,
+		key: 'support',
 	},
 ];
 

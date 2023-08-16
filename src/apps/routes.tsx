@@ -1,10 +1,12 @@
 import React, { ReactElement, useEffect } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 import Spinner from '../components/Spinner';
 import Layout from '../layouts';
 import { PUBLIC_ROUTES } from './lazyLoading';
 import LoginPage from '../pages/LoginPage';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
 interface SuspenseWrapperProps {
 	children: ReactElement;
@@ -18,14 +20,20 @@ const SuspenseWrapper = (props: SuspenseWrapperProps) => {
 
 function MainRoutes() {
 	const location = useLocation();
+
 	useEffect(() => {
 		window.scrollTo({ top: 0 });
 		// scroll to the top of the browser window when changing route
 	}, [location]);
-
+	const user = useSelector((state: RootState) => state.auth.currentUser);
+	const navigate = useNavigate();
+	useEffect(() => {
+		if (!user) navigate('/login');
+	}, []);
 	return (
 		<Routes>
 			<Route path='/login' element={<LoginPage></LoginPage>}></Route>
+
 			<Route path='/' element={<Layout />}>
 				{PUBLIC_ROUTES.map((route) => (
 					<Route

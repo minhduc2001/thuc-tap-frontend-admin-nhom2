@@ -1,23 +1,23 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {
+	AxiosInstance,
+	AxiosRequestConfig,
+	AxiosResponse,
+	InternalAxiosRequestConfig,
+} from 'axios';
 
 class Api {
-	private token: string;
-
-	constructor() {
-		this.token = localStorage.getItem('token') ?? '';
-	}
-
 	private async AXIOS(): Promise<AxiosInstance> {
 		let instance: AxiosInstance;
 
 		const config = this.getConfig();
 		instance = axios.create(config);
-		instance.interceptors.response.use(
-			// @ts-ignore
-			async (config: AxiosRequestConfig) => {
-				if (this.token) {
-					// @ts-ignore
-					config.headers['Authorization'] = `Bearer ${this.token}`;
+
+		instance.interceptors.request.use(
+			async (config: InternalAxiosRequestConfig) => {
+				if (localStorage.getItem('token')) {
+					config.headers['Authorization'] = `Bearer ${JSON.parse(
+						localStorage.getItem('token') ?? '',
+					)}`;
 				}
 				return config;
 			},
@@ -55,6 +55,8 @@ class Api {
 			baseURL: 'http://localhost:8080/api/v1',
 			headers: {
 				ContentType: 'application/json',
+				// ContentType: 'multipart/form-data',
+
 				Accept: 'application/json',
 			},
 		};

@@ -10,7 +10,11 @@ import {
 	Spin,
 } from 'antd';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { RootState } from '../redux/store';
+import { useAppDispatch } from '../redux/hooks';
+import { getMe, logout } from '../redux/features/authSlice';
 
 function Navbar() {
 	const navigateTo = useNavigate();
@@ -18,18 +22,16 @@ function Navbar() {
 	const isFetching = false;
 
 	const error = null;
+	const user = useSelector((state: RootState) => state.auth.currentUser);
+	const dispatch = useAppDispatch();
+
+	const navigate = useNavigate();
 
 	const [options, setOptions] = useState<AutoCompleteOption[]>([]);
 
 	useEffect(() => {
-		setOptions(
-			data?.data?.coins.map((coin: Coin) => ({
-				value: coin.name,
-				label: coin.name,
-				reset: { ...coin },
-			})),
-		);
-	}, [data]);
+		dispatch(getMe());
+	}, []);
 
 	const onSelect = (_value: string, option: AutoCompleteOption) => {
 		navigateTo(`/audio-book/edit/${option.reset.uuid}`);
@@ -40,8 +42,8 @@ function Navbar() {
 			// Xử lý khi nhấp vào xem thông tin
 			console.log('View Profile');
 		} else if (key === 'logout') {
-			// Xử lý khi nhấp vào logout
-			console.log('Logout');
+			dispatch(logout());
+			navigate('/login');
 		}
 	};
 
@@ -108,9 +110,11 @@ function Navbar() {
 						>
 							<Avatar
 								style={{ fontSize: '20px', marginRight: '5px' }}
-								src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS7hBVxwYgBX3U3o5Lu3dLQuzQngHKHcmNqyUdJhqali9eEub8JFyDEdMzEctZezWsLzM&usqp=CAU'
+								src={user?.avatar}
 							/>
-							<span className='text-sky-500 ml-4'>{'Minh Duc'}</span>
+							<span className='text-sky-500 ml-4'>
+								{user?.username ?? 'unknow god????'}
+							</span>
 						</div>
 					</Dropdown>
 				</div>

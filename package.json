@@ -3,7 +3,9 @@
 	"version": "0.0.0",
 	"private": true,
 	"dependencies": {
+		"@ant-design/charts": "^1.4.2",
 		"@ant-design/icons": "^5.0.1",
+		"@ant-design/plots": "^1.2.5",
 		"@reduxjs/toolkit": "^1.9.5",
 		"@testing-library/jest-dom": "^5.16.5",
 		"@testing-library/react": "^13.4.0",
@@ -17,6 +19,7 @@
 		"chart.js": "^4.2.1",
 		"dayjs": "^1.11.7",
 		"dotenv": "^16.3.1",
+		"lodash": "^4.17.21",
 		"millify": "^6.1.0",
 		"react": "^18.2.0",
 		"react-chartjs-2": "^5.2.0",
