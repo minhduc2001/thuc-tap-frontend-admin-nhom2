@@ -7,40 +7,37 @@ import CardBook from '../components/CardBook';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AudioBookApi from '../api/audioBookApi';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { RootState } from '../redux/store';
+import { useDispatch } from 'react-redux';
+import { getAllAuthor } from '../redux/features/authorSlice';
+import { LoadingStatus } from '../enums/enum';
+import AuthorCard from '../components/CardAuthor';
 
 function AuthorPage() {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [totalBooks, setTotalBooks] = useState<number | undefined>(100);
 	const [booksToShow, setBooksToShow] = useState<number>(10);
-	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [sortingMethod, setSortingMethod] = useState<string | null>(null);
 
-	const [loading, setLoading] = useState<boolean>(true);
-	const [audioBooks, setAudioBooks] = useState<any>([]);
+	const state = useAppSelector((state: RootState) => state.author);
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		fetchData();
-	}, [currentPage, booksToShow]);
-
-	const fetchData = async () => {
-		const resp = await AudioBookApi.getListAudioBook({
-			page: currentPage,
-			limit: booksToShow,
+		dispatch(
+			getAllAuthor({
+				page: currentPage,
+				limit: booksToShow,
+			}),
+		).then(() => {
+			setTotalBooks(state?.metadata?.totalItems);
 		});
-		if (resp.success) {
-			setAudioBooks(resp.data?.results);
-			setTotalBooks(resp?.data?.meta?.totalItems);
-			setLoading(false);
-		}
-	};
+	}, [currentPage, booksToShow]);
 
 	const navigate = useNavigate();
 
 	const handlePageChange = (page: number) => {
 		setCurrentPage(page);
-	};
-	const handleCategoryChange = (value: string) => {
-		setSelectedCategory(value);
 	};
 
 	const handleSortingChange = (value: string) => {
@@ -57,12 +54,12 @@ function AuthorPage() {
 
 	return (
 		<AsyncWrapper
-			loading={loading}
-			error={null}
-			fulfilled={Boolean(audioBooks)}
+			loading={state.loading == LoadingStatus.Pedding}
+			error={state.error}
+			fulfilled={Boolean(state.authors)}
 		>
-			<Helmet title='Homepage' description='Thống kê' />
-			{Boolean(audioBooks) && (
+			<Helmet title='Author Page' description='Quản lý tác giả' />
+			{Boolean(state.authors) && (
 				<>
 					<div>
 						<h1>Quản lý tác giả</h1>
@@ -91,18 +88,17 @@ function AuthorPage() {
 									color: '#3399FF',
 									width: '150px',
 								}}
-								onClick={() => navigate('/audio-book/create')}
+								onClick={() => navigate('/author/create')}
 							>
 								Thêm Tác giả
 							</Button>
 						</div>
 						<div style={{ display: 'flex', flexWrap: 'wrap' }}>
-							{audioBooks.map((book: any) => (
-								<CardBook
-									id={book.id}
-									title={book.title}
-									author={book.author}
-									image={book.image}
+							{state?.authors.map((author: any) => (
+								<AuthorCard
+									id={author.id}
+									name={author.name}
+									image={author.image}
 								/>
 							))}
 						</div>

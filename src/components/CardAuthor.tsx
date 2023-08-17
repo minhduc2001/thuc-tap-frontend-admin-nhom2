@@ -7,28 +7,15 @@ import {
 } from '@ant-design/icons';
 import { Avatar, Card } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { IAuthor } from './CardBook';
 
 const { Meta } = Card;
-export interface IAudioBook {
-	title: string;
-	image: string;
-	author: IAuthor[];
-	desc?: string;
-	id: number;
-}
 
-export interface IAuthor {
-	id: number;
-	name: string;
-	image: string;
-	desc?: string;
-}
-
-function CardBook(audioBook: IAudioBook) {
+function AuthorCard(author: IAuthor) {
 	const navigate = useNavigate();
 
 	const handleBtnEdit = (e: any) => {
-		navigate('/audio-book/edit/' + audioBook.id);
+		navigate('/author/edit/' + author.id);
 	};
 
 	const handleBtnDelete = (e: any) => {};
@@ -37,8 +24,8 @@ function CardBook(audioBook: IAudioBook) {
 			style={{ width: 240, margin: 10 }}
 			cover={
 				<img
-					alt={audioBook?.title}
-					src={audioBook?.image}
+					alt={author?.name}
+					src={author?.image}
 					className='w-full h-[200px] object-cover'
 				/>
 			}
@@ -49,19 +36,11 @@ function CardBook(audioBook: IAudioBook) {
 			]}
 		>
 			<Meta
-				avatar={
-					<Avatar
-						src={
-							audioBook?.author?.[0]?.image ??
-							'https://i.pravatar.cc/300?u=fake@pravatar.com'
-						}
-					/>
-				}
-				title={audioBook?.title}
-				description={audioBook?.desc ?? 'Đây là câu chuyện ...'}
+				title={author?.name}
+				description={author?.name ?? 'Đây là tac gia ...'}
 			/>
 		</Card>
 	);
 }
 
-export default CardBook;
+export default AuthorCard;

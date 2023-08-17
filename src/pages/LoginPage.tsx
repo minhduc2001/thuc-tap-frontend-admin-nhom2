@@ -1,10 +1,12 @@
 import React, { FormEvent, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { requestLogin } from '../redux/features/authSlice';
-import { useAppDispatch } from '../redux/hooks';
+import { getMe, logout, requestLogin } from '../redux/features/authSlice';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { toast } from 'react-toastify';
 import { toastOption } from '../configs/notification.config';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import api from '../api/api';
+import { RootState } from '../redux/store';
 
 function LoginPage() {
 	const [dataLogin, setDataLogin] = useState({ email: '', password: '' });
@@ -13,12 +15,25 @@ function LoginPage() {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		const access_token = searchParams.get('access_token');
+		const access_token = searchParams.get('accessToken');
+
 		if (access_token) {
-			localStorage.setItem('access_token', access_token);
-			navigate('/');
+			localStorage.setItem('token', JSON.stringify(access_token));
+
+			dispatch(getMe())
+				.then((resp) => {
+					console.log(resp);
+
+					if (resp.payload && Object(resp.payload).role == 'admin')
+						navigate('/');
+					else {
+						dispatch(logout());
+						toast.warn('Ban khong phai la admin', toastOption);
+					}
+				})
+				.catch((e) => console.log(e));
 		}
-	}, [searchParams, navigate]);
+	}, []);
 
 	const handleLogin = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -31,25 +46,7 @@ function LoginPage() {
 	};
 
 	const getOauthGoogleUrl = () => {
-		// const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
-		// console.log(env.GOOGLE_AUTHORIZED_REDIRECT_URI, 'asdghj');
-
-		// const options = {
-		// 	redirect_uri: env.GOOGLE_AUTHORIZED_REDIRECT_URI,
-		// 	client_id: env.GOOGLE_CLIENT_ID,
-		// 	access_type: 'offline',
-		// 	response_type: 'code',
-		// 	prompt: 'consent',
-		// 	scope: [
-		// 		'https://www.googleapis.com/auth/userinfo.profile',
-		// 		'https://www.googleapis.com/auth/userinfo.email',
-		// 	].join(' '),
-		// };
-
-		// // @ts-ignore
-		// const qs = new URLSearchParams(options);
-		// return `${rootUrl}?${qs.toString()}`;
-		return '';
+		return api.getBaseUrl() + '/auth/google';
 	};
 
 	return (

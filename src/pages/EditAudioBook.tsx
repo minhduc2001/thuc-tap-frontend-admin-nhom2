@@ -17,6 +17,7 @@ import {
 	Row,
 	Select,
 	Slider,
+	Spin,
 	Switch,
 	TreeSelect,
 	Upload,
@@ -54,6 +55,7 @@ function EditAudioBook() {
 	const [title, setTitle] = useState<string>('Thêm nội dung');
 	const [audioBook, setAudioBook] = useState<any>(null);
 	const [genres, setGenres] = useState<IGenre[]>([]);
+	const [spinning, setSpinning] = useState<boolean | undefined>(false);
 
 	let { id } = useParams();
 	const navigate = useNavigate();
@@ -128,7 +130,13 @@ function EditAudioBook() {
 		wrapperCol: { offset: 8, span: 16 },
 	};
 
+	const options = [
+		{ label: 'free', value: '1' },
+		{ label: 'vip', value: '0' },
+	];
+
 	const onFinish = (values: any) => {
+		setSpinning(true);
 		// Xử lý khi form được submit
 		values.audio = audioFile;
 		values.image = values.image.file;
@@ -151,6 +159,7 @@ function EditAudioBook() {
 					navigate('/audio-book');
 				})
 				.catch((rejectedValueOrSerializedError) => {
+					setSpinning(false);
 					toast.error(rejectedValueOrSerializedError.message, toastOption);
 				});
 		} else {
@@ -161,6 +170,7 @@ function EditAudioBook() {
 					navigate('/audio-book');
 				})
 				.catch((rejectedValueOrSerializedError) => {
+					setSpinning(false);
 					// handle error here
 					toast.error(rejectedValueOrSerializedError.message, toastOption);
 				});
@@ -221,184 +231,206 @@ function EditAudioBook() {
 			<div className='text-center w-full h-[40px] font-bold text-xl'>
 				{title}
 			</div>
-			<Form
-				{...layout}
-				onFinish={onFinish}
-				disabled={componentDisabled}
-				initialValues={{
-					...audioBook,
-					genre: audioBook?.genre?.id,
-					author: audioBook?.author[0]?.id,
-				}}
-			>
-				<Row gutter={16}>
-					{/* Phần trái cho điền thông tin về sách */}
-					<Col span={12}>
-						<Form.Item
-							label='Tên sách'
-							name='title'
-							rules={[{ required: true, message: 'Vui lòng nhập tên sách!' }]}
-						>
-							<Input />
-						</Form.Item>
-						<Form.Item
-							label='Thể loại'
-							name='genre'
-							rules={[{ required: true, message: 'Vui lòng chọn thể loại!' }]}
-						>
-							<Select>
-								{genres?.map((genre: IGenre, index: number) => {
-									return (
-										<Select.Option key={index} value={genre?.id}>
-											{genre?.name}
-										</Select.Option>
-									);
-								})}
-							</Select>
-						</Form.Item>
-
-						<Row
-							gutter={16}
-							style={{ display: 'flex', justifyContent: 'space-between' }}
-						>
-							<Col span={24}>
-								<Form.Item
-									label='Tác giả'
-									name='inputAuthor'
-									labelCol={{ span: 8 }}
-									wrapperCol={{ span: 16 }}
-								>
-									<Input
-										onChange={(e) => handleSearchAuthor(e.target.value)}
-										placeholder='Nhập tên tác giả'
-									/>
-								</Form.Item>
-							</Col>
-							<Col span={24}>
-								<Form.Item
-									label='Chọn tác giả'
-									name='author'
-									rules={[
-										{ required: true, message: 'Vui lòng nhập tác giả!' },
-									]}
-									labelCol={{ span: 8 }}
-									wrapperCol={{ span: 16 }}
-								>
-									<Select
-										showSearch
-										value={selectedAuthor}
-										onChange={(value) => {
-											setSelectedAuthor(value);
-										}}
-										notFoundContent={null}
-									>
-										{searchedAuthors.map((author: any) => (
-											<Select.Option key={author.id} value={author.id}>
-												{author.name}
-											</Select.Option>
-										))}
-									</Select>
-								</Form.Item>
-							</Col>
-						</Row>
-						<Form.Item
-							label='Năm xuất bản'
-							name='publishDate'
-							// rules={[{ required: true, message: 'Vui lòng nhập tác giả!' }]}
-						>
-							<Input />
-						</Form.Item>
-
-						<Form.Item label='Mô tả' name='desc'>
-							<TextArea rows={4} />
-						</Form.Item>
-						{/* Thêm các trường thông tin khác về sách tại đây */}
-					</Col>
-
-					{/* Phần phải cho upload ảnh và âm thanh */}
-					<Col span={12}>
-						<Form.Item
-							label='Ảnh bìa sách'
-							name='image'
-							// rules={[{ required: true, message: 'Bạn cần tải lên ảnh' }]}
-						>
-							<Upload
-								action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
-								listType='picture-card'
-								defaultFileList={fileList}
-								onChange={onChangeImage}
-								onPreview={onPreviewImage}
+			<Spin tip='Loading...' size='large' spinning={spinning}>
+				<Form
+					{...layout}
+					onFinish={onFinish}
+					disabled={componentDisabled}
+					initialValues={{
+						...audioBook,
+						genre: audioBook?.genre?.id,
+						author: audioBook?.author[0]?.id,
+						free: !audioBook?.free,
+					}}
+				>
+					<Row gutter={16}>
+						{/* Phần trái cho điền thông tin về sách */}
+						<Col span={12}>
+							<Form.Item
+								label='Tên sách'
+								name='title'
+								rules={[{ required: true, message: 'Vui lòng nhập tên sách!' }]}
 							>
-								{fileList.length < 1 && (
-									<div>
-										<PlusOutlined />
-										<div style={{ marginTop: 8 }}>Upload</div>
-									</div>
-								)}
-							</Upload>
-						</Form.Item>
-						<Form.Item
-							label='File âm thanh'
-							name='audio'
-							// rules={[{ required: true, message: 'Bạn cần tải lên âm thanh!' }]}
-						>
-							<div className='flex'>
-								<Upload
-									name='audioFile'
-									action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
-									accept='.mp3'
-									defaultFileList={audioFile}
-									showUploadList={false}
-									onChange={handleAudioChange}
-								>
-									<Button
-										icon={<UploadOutlined />}
-										disabled={Boolean(audioFileURL)}
+								<Input />
+							</Form.Item>
+							<Form.Item
+								label='Thể loại'
+								name='genre'
+								rules={[{ required: true, message: 'Vui lòng chọn thể loại!' }]}
+							>
+								<Select>
+									{genres?.map((genre: IGenre, index: number) => {
+										return (
+											<Select.Option key={index} value={genre?.id}>
+												{genre?.name}
+											</Select.Option>
+										);
+									})}
+								</Select>
+							</Form.Item>
+
+							<Form.Item
+								label='Gói'
+								name='free'
+								rules={[{ required: true, message: 'Vui lòng chọn gói!' }]}
+							>
+								<Checkbox checked={!audioBook?.free}>Vip</Checkbox>
+							</Form.Item>
+
+							<Row
+								gutter={16}
+								style={{ display: 'flex', justifyContent: 'space-between' }}
+							>
+								<Col span={24}>
+									<Form.Item
+										label='Tác giả'
+										name='inputAuthor'
+										labelCol={{ span: 8 }}
+										wrapperCol={{ span: 16 }}
 									>
-										Tải lên file âm thanh
-									</Button>
-								</Upload>
-								<Button
-									icon={<DeleteOutlined />}
-									disabled={!Boolean(audioFileURL) || componentDisabled}
-									onClick={onRemoveAudio}
-									className='ml-[20px]'
+										<Input
+											onChange={(e) => handleSearchAuthor(e.target.value)}
+											placeholder='Nhập tên tác giả'
+										/>
+									</Form.Item>
+								</Col>
+								<Col span={24}>
+									<Form.Item
+										label='Chọn tác giả'
+										name='author'
+										rules={[
+											{ required: true, message: 'Vui lòng nhập tác giả!' },
+										]}
+										labelCol={{ span: 8 }}
+										wrapperCol={{ span: 16 }}
+									>
+										<Select
+											showSearch
+											value={selectedAuthor}
+											onChange={(value) => {
+												setSelectedAuthor(value);
+											}}
+											notFoundContent={null}
+										>
+											{searchedAuthors.map((author: any) => (
+												<Select.Option key={author.id} value={author.id}>
+													{author.name}
+												</Select.Option>
+											))}
+										</Select>
+									</Form.Item>
+								</Col>
+							</Row>
+							<Form.Item
+								label='Năm xuất bản'
+								name='publishDate'
+								rules={[
+									{ required: true, message: 'Vui lòng nhập năm sản xuất!' },
+								]}
+							>
+								<Input />
+							</Form.Item>
+
+							<Form.Item label='Mô tả' name='desc'>
+								<TextArea rows={4} />
+							</Form.Item>
+							{/* Thêm các trường thông tin khác về sách tại đây */}
+						</Col>
+
+						{/* Phần phải cho upload ảnh và âm thanh */}
+						<Col span={12}>
+							<Form.Item
+								label='Ảnh bìa sách'
+								name='image'
+								rules={[{ required: true, message: 'Bạn cần tải lên ảnh' }]}
+							>
+								<Upload
+									action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
+									listType='picture-card'
+									defaultFileList={fileList}
+									onChange={onChangeImage}
+									onPreview={onPreviewImage}
 								>
-									Xóa âm thanh
-								</Button>
-							</div>
-						</Form.Item>
-						{/* Thêm các trường upload khác tại đây */}
-						{/* Hiển thị trình phát âm thanh */}
-						{audioFileURL && (
-							// <Row gutter={16}>
-							// 	<Col span={24} offset={1}>
-							<div className='w-full'>
-								{/* <audio src={audioFileURL} controls className='w-full' /> */}
-								<ReactPlayer
-									url={audioFileURL}
-									controls
-									width='100%'
-									height='40px'
-								/>
-							</div>
+									{fileList.length < 1 && (
+										<div>
+											<PlusOutlined />
+											<div style={{ marginTop: 8 }}>Upload</div>
+										</div>
+									)}
+								</Upload>
+							</Form.Item>
+							<Form.Item
+								label='File âm thanh'
+								name='audio'
+								rules={[
+									{
+										required: audioFileURL ? false : true,
+										message: 'Bạn cần tải lên âm thanh!',
+									},
+								]}
+							>
+								<div className='flex'>
+									<Upload
+										name='audioFile'
+										action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
+										accept='.mp3'
+										defaultFileList={audioFile}
+										showUploadList={false}
+										onChange={handleAudioChange}
+									>
+										<Button
+											icon={<UploadOutlined />}
+											disabled={Boolean(audioFileURL)}
+										>
+											Tải lên file âm thanh
+										</Button>
+									</Upload>
+									<Button
+										icon={<DeleteOutlined />}
+										disabled={!Boolean(audioFileURL) || componentDisabled}
+										onClick={onRemoveAudio}
+										className='ml-[20px]'
+									>
+										Xóa âm thanh
+									</Button>
+								</div>
+							</Form.Item>
+							{/* Thêm các trường upload khác tại đây */}
+							{/* Hiển thị trình phát âm thanh */}
+							{audioFileURL && (
+								// <Row gutter={16}>
+								// 	<Col span={24} offset={1}>
+								<div className='w-full'>
+									{/* <audio src={audioFileURL} controls className='w-full' /> */}
+									<ReactPlayer
+										url={audioFileURL}
+										controls
+										width='100%'
+										height='40px'
+									/>
+								</div>
 
-							// 	</Col>
-							// </Row>
-						)}
-					</Col>
-				</Row>
+								// 	</Col>
+								// </Row>
+							)}
+						</Col>
+					</Row>
 
-				<Form.Item {...tailLayout}>
-					<Button htmlType='submit' onClick={handleBtnSubmit} disabled={false}>
-						{title == 'Thêm nội dung'
-							? 'Lưu'
-							: componentDisabled
-							? 'Sửa'
-							: 'Cập nhật'}
-					</Button>
-				</Form.Item>
-			</Form>
+					<Form.Item {...tailLayout}>
+						<Button
+							htmlType='submit'
+							onClick={handleBtnSubmit}
+							disabled={false}
+						>
+							{title == 'Thêm nội dung'
+								? 'Lưu'
+								: componentDisabled
+								? 'Sửa'
+								: 'Cập nhật'}
+						</Button>
+					</Form.Item>
+				</Form>
+			</Spin>
 		</AsyncWrapper>
 	);
 }

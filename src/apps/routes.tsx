@@ -7,6 +7,8 @@ import { PUBLIC_ROUTES } from './lazyLoading';
 import LoginPage from '../pages/LoginPage';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
+import { useAppDispatch } from '../redux/hooks';
+import { getMe } from '../redux/features/authSlice';
 
 interface SuspenseWrapperProps {
 	children: ReactElement;
@@ -27,8 +29,12 @@ function MainRoutes() {
 	}, [location]);
 	const user = useSelector((state: RootState) => state.auth.currentUser);
 	const navigate = useNavigate();
+	const token = localStorage.getItem('token');
+	const dispatch = useAppDispatch();
 	useEffect(() => {
-		if (!user) navigate('/login');
+		dispatch(getMe()).then((resp) => {
+			if (!resp.payload) navigate('/login');
+		});
 	}, []);
 	return (
 		<Routes>

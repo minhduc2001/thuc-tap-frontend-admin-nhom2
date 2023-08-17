@@ -29,9 +29,9 @@ function Navbar() {
 
 	const [options, setOptions] = useState<AutoCompleteOption[]>([]);
 
-	useEffect(() => {
-		dispatch(getMe());
-	}, []);
+	// useEffect(() => {
+	// 	dispatch(getMe());
+	// }, []);
 
 	const onSelect = (_value: string, option: AutoCompleteOption) => {
 		navigateTo(`/audio-book/edit/${option.reset.uuid}`);

@@ -33,12 +33,14 @@ function ProfilePage() {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		dispatch(getMe()).then(() => {
-			setLoading(false);
-			if (state.error) {
-				toast.error(state.error.message, toastOption);
-			}
-		});
+		dispatch(getMe())
+			.unwrap()
+			.then(() => {
+				if (state.error?.message) {
+					toast.error(state.error.message, toastOption);
+				}
+				setLoading(false);
+			});
 	}, []);
 
 	const layout = {

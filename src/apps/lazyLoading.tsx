@@ -5,6 +5,7 @@ const AudioBookpage = React.lazy(() => import('../pages/AudioBookPage'));
 const EditAudioBook = React.lazy(() => import('../pages/EditAudioBook'));
 const ProfilePage = React.lazy(() => import('../pages/ProfilePage'));
 const AuthorPage = React.lazy(() => import('../pages/AuthorPage'));
+const EditAuthorPage = React.lazy(() => import('../pages/EditAuthorPage'));
 const SupportPage = React.lazy(() => import('../pages/SupportPage'));
 const SupportDetailPage = React.lazy(
 	() => import('../pages/RequestDetailPage'),
@@ -36,6 +37,14 @@ export const PUBLIC_ROUTES = [
 	{
 		path: 'author',
 		component: AuthorPage,
+	},
+	{
+		path: 'author/create',
+		component: EditAuthorPage,
+	},
+	{
+		path: 'author/edit/:id',
+		component: EditAuthorPage,
 	},
 	{
 		path: 'support',

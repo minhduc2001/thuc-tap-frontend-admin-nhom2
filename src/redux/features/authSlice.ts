@@ -40,7 +40,8 @@ export const uploadAvatar = createAsyncThunk(
 	},
 );
 
-export const logout = createAsyncThunk('', async (_, thunkAPI) => {
+export const logout = createAsyncThunk('logout', async (_, thunkAPI) => {
+	await AuthApi.logout();
 	return null;
 });
 
@@ -65,8 +66,6 @@ const authSlice = createSlice({
 		builder
 			.addCase(requestLogin.fulfilled, (state, action) => {
 				state.currentUser = action.payload;
-				state.loading = LoadingStatus.Fulfilled;
-				state.error = null;
 			})
 			.addCase(requestLogin.rejected, (state, action) => {
 				state.error = { message: action.error.message ?? '' };
@@ -74,23 +73,17 @@ const authSlice = createSlice({
 			})
 			.addCase(getMe.fulfilled, (state, action) => {
 				state.currentUser = action.payload;
-				state.loading = LoadingStatus.Fulfilled;
-				state.error = null;
 			})
 			.addCase(updateUser.fulfilled, (state, action) => {
 				state.currentUser = action.payload;
-				state.loading = LoadingStatus.Fulfilled;
-				state.error = null;
 			})
 			.addCase(uploadAvatar.fulfilled, (state, action) => {
 				state.currentUser = action.payload;
-				state.error = null;
 			})
 			.addCase(logout.fulfilled, (state, action) => {
 				state.currentUser = action.payload;
 				state.accessToken = '';
 				localStorage.clear();
-				state.loading = LoadingStatus.Fulfilled;
 			})
 			.addMatcher(
 				(action) => action.type.includes('rejected'),
@@ -100,6 +93,13 @@ const authSlice = createSlice({
 						errorCode: action.error.code,
 					};
 					state.loading = LoadingStatus.Rejected;
+				},
+			)
+			.addMatcher(
+				(action) => action.type.includes('fulfilled'),
+				(state, action) => {
+					state.error = null;
+					state.loading = LoadingStatus.Fulfilled;
 				},
 			)
 			.addDefaultCase((state, action) => {

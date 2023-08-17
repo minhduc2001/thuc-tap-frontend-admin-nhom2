@@ -16,6 +16,7 @@ import storage from 'redux-persist/lib/storage';
 import authSlice from './features/authSlice';
 import audiobookSlice from './features/audiobookSlice';
 import genreSlice from './features/genreSlice';
+import authorSlice from './features/authorSlice';
 
 const persistConfig = {
 	key: 'root',
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
 	auth: authSlice,
 	audiobook: audiobookSlice,
 	genre: genreSlice,
+	author: authorSlice,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

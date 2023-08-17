@@ -26,6 +26,10 @@ class AuthApi {
 	async refreshToken(): Promise<ApiResponse<IToken>> {
 		return Api.POST<ApiResponse<IToken>>(this.baseUrl + 'refresh', {});
 	}
+
+	async logout() {
+		return Api.POST(this.baseUrl + '/logout', {});
+	}
 }
 
 export default new AuthApi();
