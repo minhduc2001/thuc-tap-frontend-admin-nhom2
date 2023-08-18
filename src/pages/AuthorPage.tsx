@@ -99,6 +99,7 @@ function AuthorPage() {
 									id={author.id}
 									name={author.name}
 									image={author.image}
+									key={author.id}
 								/>
 							))}
 						</div>

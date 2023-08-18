@@ -9,10 +9,37 @@ import {
 	Button,
 	Modal,
 } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAppDispatch } from '../redux/hooks';
+import supportApi from '../api/supportApi';
+import { toast } from 'react-toastify';
+import { toastOption } from '../configs/notification.config';
+import { Support } from '../redux/features/supportSlice';
+import { EPrioritySuport, EResloved } from '../enums/enum';
+import { render } from 'react-dom';
 
 const { Title, Text } = Typography;
 function RequestDetailPage() {
+	let { id } = useParams();
+	const [request, setRequest] = useState<Support | any>({});
+
+	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		if (!id) navigate('/404');
+		else
+			supportApi.getSupport(id ?? 'REQ001').then((resp) => {
+				if (resp.message) {
+					toast.warn(resp.message, toastOption);
+					navigate('/support');
+				} else {
+					setRequest(resp.data as Support);
+				}
+			});
+	}, []);
+
 	const [cancelModalVisible, setCancelModalVisible] = useState(false);
 	const handleCancelConfirm = () => {
 		// Xử lý hủy bỏ yêu cầu
@@ -26,27 +53,21 @@ function RequestDetailPage() {
 	const hideCancelModal = () => {
 		setCancelModalVisible(false);
 	};
-	const [request, setRequest] = useState({
-		code: 'REQ001',
-		subject: 'Hỗ trợ kỹ thuật',
-		name: 'Nguyễn Văn A',
-		content:
-			'Không thể kết nối mạng bjhsfgjsdh asughfusagh uhgaudg sajagduyags uhgdgauysgd ua aydg a7ygdaysdgaiy d g8a7gd ahbdaug dahgda8uhd a sygd8ay8s gdiuasjhgd8asuygd aisjhghdayugd aiusugdasydgua sygdiua duiausyhd8asudh akdjadghiuwq diasjhdaygd asud8ad8q wdiauwhgdiaw hdkasjhd iawshdaisug kán kasncsajgdccauisgcjzhg xcjkajkbdcauisygdai sjbdausygd asiudhiasuhg xcjashgdasuygdia hxcjahsbdaiusiugdawuysgdkja  dausygdiuashgd uabd ajgdauygdaisugd asidbiasuhdoiashdfsaibdkjashduwqhdsakjbdiashu dcaksjhdcaisuhdciaus hdijasgd iuauhdasiuhd asjuhgdisuagduiah dasuyhgdaushdiuashd askjdbiausgduias dfikaghhfdiusahdfiou ah d iuashdfuawiysgdfjuisahd bsaiuh daisohfdiuesagdfjiwegfr dsjachf basuihfc aksjgfiajsk fhjsadgfcu asjhgfskhf aslughfjkasdbckjasjhgfuyawefusahbf uywssge dfjsaghhdf uahsbdf ukywegd jkAJHDBuyhuaygduw ey',
-		createdAt: '2023-08-10 09:30',
-		priority: <Tag color='error'>Cao</Tag>,
-		resolved: 1,
-	});
+
 	const dataSource = [
-		{ label: 'Mã', value: request.code },
-		{ label: 'Chủ đề', value: request.subject },
+		{ label: 'Mã', value: request?.code },
+		{ label: 'Chủ đề', value: request?.subject?.title },
 		{
 			label: 'Người tạo',
 			value: (
 				<Table
 					pagination={false}
 					dataSource={[
-						{ label: 'Tên người dùng', value: 'jaj' },
-						{ label: 'email', value: 'minhduc@gmail.com' },
+						{
+							label: 'Tên người dùng',
+							value: request?.user?.username ?? 'unknow god???',
+						},
+						{ label: 'email', value: request?.user?.email },
 					]}
 					columns={[
 						{
@@ -65,11 +86,17 @@ function RequestDetailPage() {
 				></Table>
 			),
 		},
-		{ label: 'Tên', value: request.name },
-		{ label: 'Nội dung', value: request.content },
-		{ label: 'Thời gian tạo', value: request.createdAt },
-		{ label: 'Mức độ', value: request.priority },
-		{ label: 'Đã giải quyết', value: request.resolved ? 'Có' : 'Không' },
+		{ label: 'Tên', value: request?.title },
+		{ label: 'Nội dung', value: request?.content },
+		{ label: 'Thời gian tạo', value: request?.createdAt },
+		{
+			label: 'Mức độ',
+			value: <Tag color='error'>{EPrioritySuport[request?.priority]}</Tag>,
+		},
+		{
+			label: 'Đã giải quyết',
+			value: EResloved[request?.resolved],
+		},
 	];
 
 	const columns = [
@@ -136,38 +163,20 @@ function RequestDetailPage() {
 						/>
 					))} */}
 					<div className='flex flex-wrap justify-evenly'>
-						<Image
-							src={
-								'https://gamek.mediacdn.vn/133514250583805952/2022/4/6/be1-164922643669587606129.jpg'
-							}
-							alt={`Hình ảnh`}
-							className='mb-2 mx-2'
-							width='300px'
-						/>
-						<Image
-							src={
-								'https://gamek.mediacdn.vn/133514250583805952/2022/4/6/be1-164922643669587606129.jpg'
-							}
-							alt={`Hình ảnh`}
-							className='mb-2 mx-2'
-							width='300px'
-						/>
-						<Image
-							src={
-								'https://gamek.mediacdn.vn/133514250583805952/2022/4/6/be1-164922643669587606129.jpg'
-							}
-							alt={`Hình ảnh`}
-							className='mb-2 mx-2'
-							width='300px'
-						/>
-						<Image
-							src={
-								'https://gamek.mediacdn.vn/133514250583805952/2022/4/6/be1-164922643669587606129.jpg'
-							}
-							alt={`Hình ảnh`}
-							className='mb-2 mx-2'
-							width='300px'
-						/>
+						{request?.images?.map((src: string, index: number) => {
+							return (
+								<Image
+									src={
+										src ??
+										'https://gamek.mediacdn.vn/133514250583805952/2022/4/6/be1-164922643669587606129.jpg'
+									}
+									alt={`Hình ảnh ${index}`}
+									className='mb-2 mx-2'
+									width='300px'
+									key={index}
+								/>
+							);
+						})}
 					</div>
 				</Card>
 			</Col>

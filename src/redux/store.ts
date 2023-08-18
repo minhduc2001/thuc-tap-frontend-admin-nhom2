@@ -17,6 +17,7 @@ import authSlice from './features/authSlice';
 import audiobookSlice from './features/audiobookSlice';
 import genreSlice from './features/genreSlice';
 import authorSlice from './features/authorSlice';
+import supportSlice from './features/supportSlice';
 
 const persistConfig = {
 	key: 'root',
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
 	audiobook: audiobookSlice,
 	genre: genreSlice,
 	author: authorSlice,
+	support: supportSlice,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

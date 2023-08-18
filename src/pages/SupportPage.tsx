@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AsyncWrapper from '../layouts/AsyncWrapper';
 import {
 	Button,
@@ -12,168 +12,28 @@ import {
 	Space,
 	Table,
 	Tag,
-	Typography,
-	Upload,
-	UploadFile,
-	UploadProps,
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { RootState } from '../redux/store';
+import { EPrioritySuport, EResloved, LoadingStatus } from '../enums/enum';
+import { Support, getSupport } from '../redux/features/supportSlice';
 
 function SupportPage() {
 	const navigate = useNavigate();
+	const state = useAppSelector((state: RootState) => state.support);
+
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		dispatch(getSupport({}));
+	}, []);
+
 	const optionsOperation = [
 		'Tất cả',
 		'Đã giải quyết',
 		'Chưa giải quyết',
 		'Đã hủy',
-	];
-	const data = [
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-		{
-			code: 'REQ001',
-			subject: 'Hỗ trợ kỹ thuật',
-			name: 'Nguyễn Văn A',
-			content: 'Không thể kết nối mạng',
-			createdAt: '2023-08-10 09:30',
-			priority: <Tag color='error'>Cao</Tag>,
-			resolved: optionsOperation[1],
-		},
-
-		// Thêm dữ liệu khác
 	];
 
 	const columns = [
@@ -206,16 +66,23 @@ function SupportPage() {
 			title: 'Mức độ',
 			dataIndex: 'priority',
 			key: 'priority',
+			render: (priority: number) => (
+				<Tag color='error'>{EPrioritySuport[priority]}</Tag>
+			),
 		},
 		{
 			title: 'Đã giải quyết',
 			dataIndex: 'resolved',
 			key: 'resolved',
-			// render: (resolved: any) => (resolved ? 'Có' : 'Không'),
+			render: (resolved: number) => EResloved[resolved],
 		},
 	];
 	return (
-		<AsyncWrapper loading={false} error={null} fulfilled={true}>
+		<AsyncWrapper
+			loading={state.loading == LoadingStatus.Pedding}
+			error={state.error}
+			fulfilled={Boolean(state.supports)}
+		>
 			<div className='p-8'>
 				<div className='mb-4'>
 					<Select className='mr-2 w-[150px]' placeholder='Lọc theo mức độ'>
@@ -241,7 +108,7 @@ function SupportPage() {
 					</Select>
 				</div>
 				<Table
-					dataSource={data}
+					dataSource={state.supports}
 					columns={columns}
 					onRow={(record) => ({
 						onDoubleClick: (e) => {

@@ -5,8 +5,7 @@ import Spinner from '../components/Spinner';
 import Layout from '../layouts';
 import { PUBLIC_ROUTES } from './lazyLoading';
 import LoginPage from '../pages/LoginPage';
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+
 import { useAppDispatch } from '../redux/hooks';
 import { getMe } from '../redux/features/authSlice';
 
@@ -27,9 +26,9 @@ function MainRoutes() {
 		window.scrollTo({ top: 0 });
 		// scroll to the top of the browser window when changing route
 	}, [location]);
-	const user = useSelector((state: RootState) => state.auth.currentUser);
+
 	const navigate = useNavigate();
-	const token = localStorage.getItem('token');
+
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		dispatch(getMe()).then((resp) => {

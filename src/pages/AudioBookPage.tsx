@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AsyncWrapper from '../layouts/AsyncWrapper';
 import Helmet from '../components/Helmet';
-import { Button, Input, Pagination, PaginationProps, Select } from 'antd';
+import { Button, Input, Pagination, PaginationProps, Select, Spin } from 'antd';
 import { Option } from 'antd/es/mentions';
 import CardBook from '../components/CardBook';
 import { PlusOutlined } from '@ant-design/icons';
@@ -15,10 +15,10 @@ import { listGenre } from '../redux/features/genreSlice';
 
 function AudioBookPage() {
 	const [currentPage, setCurrentPage] = useState<number>(1);
-	const [totalBooks, setTotalBooks] = useState<number>(100);
 	const [booksToShow, setBooksToShow] = useState<number>(12);
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [sortingMethod, setSortingMethod] = useState<string | null>(null);
+	const [spinning, setSpinning] = useState<boolean>(false);
 
 	const [loading, setLoading] = useState<boolean>(true);
 	const listAudioBooks = useSelector((state: RootState) => state.audiobook);
@@ -30,6 +30,7 @@ function AudioBookPage() {
 		// if (selectedCategory) {
 		// 	config.filter = `{ "genre.id": "${selectedCategory}"}`;
 		// }
+		setSpinning(true);
 
 		dispatch(getAllAudioBook({ page: currentPage, limit: booksToShow })).then(
 			() => fetchData(),
@@ -41,10 +42,8 @@ function AudioBookPage() {
 	}, []);
 
 	const fetchData = async () => {
-		if (listAudioBooks.metadata.totalItems) {
-			setTotalBooks(listAudioBooks?.metadata?.totalItems ?? 100);
-		}
-		setLoading(false);
+		if (loading == true) setLoading(false);
+		setSpinning(false);
 	};
 
 	const navigate = useNavigate();
@@ -62,8 +61,8 @@ function AudioBookPage() {
 			config.filter = `{ "genre.id": "${value}"}`;
 		}
 
-		setLoading(true);
-		dispatch(getAllAudioBook(config)).then(() => fetchData());
+		setSpinning(true);
+		dispatch(getAllAudioBook(config)).then(() => setSpinning(false));
 	};
 
 	const handleSortingChange = (value: string) => {
@@ -131,25 +130,27 @@ function AudioBookPage() {
 								Thêm sách nói
 							</Button>
 						</div>
-						<div style={{ display: 'flex', flexWrap: 'wrap' }}>
-							{listAudioBooks.audioBooks.map((book: any, index: number) => (
-								<CardBook
-									key={index}
-									id={book.id}
-									title={book.title}
-									author={book.author}
-									image={book.image}
-								/>
-							))}
-						</div>
-						<Pagination
-							current={currentPage}
-							onChange={handlePageChange}
-							total={totalBooks}
-							pageSize={booksToShow}
-							onShowSizeChange={onShowSizeChange}
-							style={{ marginTop: 20, textAlign: 'center' }}
-						/>
+						<Spin tip='Loading...' size='large' spinning={spinning}>
+							<div style={{ display: 'flex', flexWrap: 'wrap' }}>
+								{listAudioBooks.audioBooks.map((book: any, index: number) => (
+									<CardBook
+										key={index}
+										id={book.id}
+										title={book.title}
+										author={book.author}
+										image={book.image}
+									/>
+								))}
+							</div>
+							<Pagination
+								current={currentPage}
+								onChange={handlePageChange}
+								total={listAudioBooks.metadata.totalItems}
+								pageSize={booksToShow}
+								onShowSizeChange={onShowSizeChange}
+								style={{ marginTop: 20, textAlign: 'center' }}
+							/>
+						</Spin>
 					</div>
 				</>
 			)}

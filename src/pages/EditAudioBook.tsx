@@ -274,7 +274,7 @@ function EditAudioBook() {
 								name='free'
 								rules={[{ required: true, message: 'Vui lòng chọn gói!' }]}
 							>
-								<Checkbox checked={!audioBook?.free}>Vip</Checkbox>
+								<Checkbox checked={!audioBook?.free ?? false}>Vip</Checkbox>
 							</Form.Item>
 
 							<Row

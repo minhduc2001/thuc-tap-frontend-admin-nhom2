@@ -23,10 +23,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { toast } from 'react-toastify';
 import { toastOption } from '../configs/notification.config';
+import { LoadingStatus } from '../enums/enum';
 
 function ProfilePage() {
 	const [componentDisabled, setComponentDisabled] = useState<boolean>(true);
-	const [loading, setLoading] = useState<boolean>(true);
 	const state = useSelector((state: RootState) => state.auth);
 	const user = state?.currentUser;
 
@@ -39,8 +39,8 @@ function ProfilePage() {
 				if (state.error?.message) {
 					toast.error(state.error.message, toastOption);
 				}
-				setLoading(false);
-			});
+			})
+			.catch((e) => console.log(e));
 	}, []);
 
 	const layout = {
@@ -68,7 +68,7 @@ function ProfilePage() {
 
 	return (
 		<AsyncWrapper
-			loading={loading}
+			loading={state.loading == LoadingStatus.Pedding}
 			error={state?.error}
 			fulfilled={Boolean(user)}
 		>

@@ -52,7 +52,7 @@ class Api {
 
 	private getConfig() {
 		return {
-			baseURL: ' https://96ff-14-232-135-216.ngrok-free.app/api/v1',
+			baseURL: 'http://localhost:8080/api/v1',
 			headers: {
 				ContentType: 'application/json',
 				// ContentType: 'multipart/form-data',

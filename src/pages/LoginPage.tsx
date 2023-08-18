@@ -7,6 +7,7 @@ import { toastOption } from '../configs/notification.config';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api/api';
 import { RootState } from '../redux/store';
+import { ERole } from '../interfaces/user.interface';
 
 function LoginPage() {
 	const [dataLogin, setDataLogin] = useState({ email: '', password: '' });
@@ -21,11 +22,8 @@ function LoginPage() {
 			localStorage.setItem('token', JSON.stringify(access_token));
 
 			dispatch(getMe())
-				.then((resp) => {
-					console.log(resp);
-
-					if (resp.payload && Object(resp.payload).role == 'admin')
-						navigate('/');
+				.then((resp: any) => {
+					if (resp.payload && resp.payload.role == ERole.Admin) navigate('/');
 					else {
 						dispatch(logout());
 						toast.warn('Ban khong phai la admin', toastOption);
@@ -37,11 +35,16 @@ function LoginPage() {
 
 	const handleLogin = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		dispatch(requestLogin(dataLogin)).then((data) => {
+		dispatch(requestLogin(dataLogin)).then((data: any) => {
 			if (data.meta.requestStatus == 'rejected') {
 				// @ts-ignore
 				toast.error(data.error.message, toastOption);
-			} else navigate('/');
+			} else {
+				if (data.payload.role !== ERole.Admin) {
+					dispatch(logout());
+					toast.warn('Ban khong phai la admin', toastOption);
+				} else navigate('/');
+			}
 		});
 	};
 
